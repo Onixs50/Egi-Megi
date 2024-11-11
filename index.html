@@ -1,0 +1,2502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EgiMegi Game</title>
+    
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/MotionPathPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #000;
+            font-family: 'Orbitron', sans-serif;
+            overflow-x: hidden;
+            color: white;
+        }
+
+.game-container {
+    min-height: 100vh;
+    max-height: 100vh;
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 1rem;
+    padding: 2rem;
+    max-width: 400px;
+    width: 90%;
+    transform: scale(0.9);
+    opacity: 0;
+    position: relative;
+    z-index: 10000;
+}
+
+.welcome-screen {
+    position: fixed;
+    inset: 0;
+    background: black;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+        .welcome-video {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .welcome-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        .welcome-text {
+            font-size: 4rem;
+            color: #FFD700;
+            text-shadow: 
+                0 0 7px #fff,
+                0 0 10px #fff,
+                0 0 21px #fff,
+                0 0 42px #FFD700,
+                0 0 82px #FFD700,
+                0 0 92px #FFD700,
+                0 0 102px #FFD700,
+                0 0 151px #FFD700;
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        .onixia-text {
+            font-size: 2rem;
+            color: #E3B04B;
+            text-shadow: 
+                0 0 7px #E3B04B,
+                0 0 10px #E3B04B,
+                0 0 21px #E3B04B;
+            margin-bottom: 2rem;
+            opacity: 0;
+        }
+
+        .enter-button {
+            background: #FFD700;
+            color: black;
+            padding: 1rem 3rem;
+            border-radius: 9999px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            outline: none;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .enter-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .geometric-bg {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .geometric-shape {
+            position: absolute;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            transform-origin: center;
+            animation: rotate 20s linear infinite;
+            opacity: 0.3;
+        }
+
+        .game-bg {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #332b00 0%, #1a1a1a 100%);
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .nft-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            place-items: center;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #FFD700 rgba(0, 0, 0, 0.3);
+        }
+
+        .nft-section::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .nft-section::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        .nft-section::-webkit-scrollbar-thumb {
+            background: #FFD700;
+border-radius: 4px;
+        }
+
+        .nft-card {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .nft-card:hover {
+            transform: translateY(-5px);
+            border-color: #FFD700;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+        }
+
+        .owned-nft-display {
+            background: rgba(20, 20, 20, 0.8);
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin: 2rem auto;
+            max-width: 400px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+        }
+
+        .owned-nft-display h3 {
+            color: #FFD700;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        .enter-game-button {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: black;
+            padding: 1rem 2rem;
+            border-radius: 9999px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border: none;
+            outline: none;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .enter-game-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+        }
+
+        .enter-game-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Updated Game Board Layout */
+        .game-board {
+            position: relative;
+            width: 100%;
+            min-height: calc(100vh - 80px);
+            padding-top: 80px;
+            overflow: hidden;
+        }
+
+        /* Updated Header Elements Positioning */
+        .token-counter {
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #FFD700;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            color: #FFD700;
+            z-index: 100;
+        }
+
+        .click-counter {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #FFD700;
+            color: #FFD700;
+            font-size: 1.2rem;
+            z-index: 100;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #FFD700;
+            color: #FFD700;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Info Button Position */
+        .info-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #FFD700;
+            color: #FFD700;
+            padding: 0.8rem;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .info-panel {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            border-left: 2px solid #FFD700;
+            padding: 2rem;
+            transition: transform 0.3s ease;
+            z-index: 999;
+            overflow-y: auto;
+        }
+
+        .info-panel.active {
+            transform: translateX(-400px);
+        }
+
+        /* Walking Chicken */
+.walking-chicken {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    z-index: 950;
+    transition: transform 0.2s;
+    pointer-events: all;
+}
+
+.walking-chicken:hover {
+    transform: scale(1.1);
+}
+
+.walking-chicken svg {
+    width: 100%;
+    height: 100%;
+}
+        /* Dance Video Container */
+        .dance-video-container {
+            position: fixed;
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 900;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Updated Game Effects */
+        .fantasy-explosion,
+        .coin-rain,
+        .magic-portal,
+        .magic-spell,
+        .color-vortex,
+        .crystal-break,
+        .energy-wave,
+        .star-dance,
+        .crystal-burst,
+        .fire-vortex,
+        .rainbow-splash,
+        .lightning-storm,
+        .galaxy-spin,
+        .diamond-shower,
+        .golden-fractal {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .particle {
+            position: absolute;
+            pointer-events: none;
+        }
+
+        /* Animation Keyframes */
+        @keyframes particleFade {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        @keyframes wave {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+
+        @keyframes sparkle {
+            0% { transform: scale(0) rotate(0deg); }
+            50% { transform: scale(1) rotate(180deg); }
+            100% { transform: scale(0) rotate(360deg); }
+        }
+
+        /* Updated Egg Grid */
+        .egg-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 100px;
+        }
+
+        .egg {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform-origin: center;
+        }
+
+        .egg:hover {
+            transform: scale(1.05);
+        }
+
+        .egg img {
+            width: 100%;
+            height: auto;
+            transition: transform 0.2s ease;
+        }
+
+        .egg.cracked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 20%;
+            right: 20%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.8);
+            transform: rotate(-45deg);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            animation: crack 0.3s forwards;
+        }
+
+        @keyframes crack {
+            from {
+                transform: scale(0) rotate(-45deg);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) rotate(-45deg);
+                opacity: 1;
+            }
+        }
+
+        /* Loading and Notifications */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid rgba(255, 215, 0, 0.3);
+            border-top-color: #FFD700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .notification {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            color: white;
+            transform: translateY(-100%);
+            opacity: 0;
+            z-index: 1000;
+        }
+
+        .notification.success {
+            background: rgba(34, 197, 94, 0.9);
+        }
+
+        .notification.error {
+            background: rgba(239, 68, 68, 0.9);
+        }
+
+        /* Waiting Animation */
+        .waiting-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            z-index: 1000;
+        }
+
+.waiting-animation::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 5px solid rgba(255, 215, 0, 0.3);
+    border-top-color: #FFD700;
+    border-radius: 50%;
+    animation: waitingSpin 1s linear infinite;
+}
+
+.wallet-option {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    border-radius: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 1rem 0;
+}
+
+.wallet-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    border-color: #FFD700;
+}
+        @keyframes waitingSpin {
+to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Welcome Screen -->
+    <div id="welcomeScreen" class="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center">
+        <video id="welcomeVideo" class="absolute inset-0 w-full h-full object-cover" playsinline muted>
+            <source src="welcome.mp4" type="video/mp4">
+        </video>
+        <div class="relative z-10 text-center space-y-8 welcome-content">
+            <h1 class="welcome-text">Welcome to EgiMegi</h1>
+            <p class="onixia-text">onixia</p>
+            <button class="enter-button" onclick="startGame()">Enter Game</button>
+        </div>
+    </div>
+
+    <!-- Game Container -->
+    <div id="gameContainer" class="game-container hidden">
+        <!-- Geometric Background -->
+        <div class="geometric-bg" id="geometricBg"></div>
+
+        <!-- Header -->
+        <header class="flex justify-between items-center p-4">
+            <div class="flex items-center space-x-4">
+                <div id="tokenInfo" class="token-counter hidden">
+                    <div class="text-sm text-gray-400">EGM Balance</div>
+                    <div id="tokenBalance" class="text-2xl font-bold text-yellow-400">0</div>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-6">
+                <!-- Social Links -->
+                <div class="flex space-x-4">
+                    <a href="https://github.com/onixs50" target="_blank" class="text-yellow-400 hover:text-yellow-300">
+                        <i class="fab fa-github text-xl"></i>
+                    </a>
+                    <a href="https://twitter.com/sadeghss50" target="_blank" class="text-yellow-400 hover:text-yellow-300">
+                        <i class="fab fa-twitter text-xl"></i>
+                    </a>
+                </div>
+                
+                <button onclick="showWalletModal()" id="connectButton" 
+                        class="px-6 py-3 bg-transparent border-2 border-yellow-400 rounded-lg
+                               text-yellow-400 hover:bg-yellow-400 hover:text-black
+                               transition-all duration-300">
+                    Connect Wallet
+                </button>
+            </div>
+        </header>
+
+        <!-- NFT Section -->
+        <div id="nftSection" class="nft-section hidden">
+            <!-- Basic Hammer NFT -->
+            <div class="nft-card">
+                <video autoplay loop muted playsinline class="w-full h-64 object-contain mb-4 rounded-lg">
+                    <source src="b.mp4" type="video/mp4">
+                </video>
+                <h3 class="text-2xl font-bold text-yellow-400 mb-2">Basic Hammer</h3>
+                <p class="text-gray-400 mb-4">Price: 0.00002 ETH</p>
+                <button onclick="mintHammer(false)" 
+                        class="w-full py-3 bg-yellow-400/20 border border-yellow-400 rounded-lg
+                               text-yellow-400 hover:bg-yellow-400 hover:text-black
+                               transition-all duration-300">
+                    Mint Basic Hammer
+                </button>
+            </div>
+
+            <!-- Advanced Hammer NFT -->
+            <div class="nft-card">
+                <video autoplay loop muted playsinline class="w-full h-64 object-contain mb-4 rounded-lg">
+                    <source src="a.mp4" type="video/mp4">
+                </video>
+                <h3 class="text-2xl font-bold text-yellow-400 mb-2">Advanced Hammer</h3>
+                <p class="text-gray-400 mb-4">Price: 0.00005 ETH</p>
+                <button onclick="mintHammer(true)" 
+                        class="w-full py-3 bg-yellow-400/20 border border-yellow-400 rounded-lg
+                               text-yellow-400 hover:bg-yellow-400 hover:text-black
+                               transition-all duration-300">
+                    Mint Advanced Hammer
+                </button>
+            </div>
+        </div>
+
+        <!-- Owned NFT Display -->
+        <div id="ownedNFTDisplay" class="owned-nft-display hidden">
+            <h3>Your NFT</h3>
+            <p id="nftType" class="text-yellow-400 text-lg mb-4"></p>
+            <button onclick="startGamePhase()" id="enterGameButton" class="enter-game-button">
+                Enter Game
+            </button>
+        </div>
+
+        <!-- Game Board -->
+        <div id="gameBoard" class="hidden">
+            <!-- Back Button -->
+            <button onclick="returnToNFTSection()" class="back-button">
+                <i class="fas fa-arrow-left mr-2"></i> Back to NFT
+            </button>
+
+            <!-- Click Counter -->
+            <div id="clickCounter" class="click-counter hidden">
+                Chicken Clicks: <span id="clickCount">0</span>
+            </div>
+
+            <!-- Matrix Effect Container -->
+            <div id="matrixContainer" class="matrix-container"></div>
+
+            <!-- Dance Video Container -->
+            <div id="danceVideoContainer" class="dance-video-container">
+                <video id="danceVideo" src="chikdanse.mp4" muted playsinline></video>
+            </div>
+
+            <!-- Info Button -->
+            <button class="info-button" onclick="toggleInfoPanel()">
+                <i class="fas fa-info"></i>
+            </button>
+
+            <!-- Info Panel -->
+            <div class="info-panel" id="infoPanel">
+                <h2 class="text-2xl font-bold text-yellow-400 mb-4">How to Play</h2>
+                <div class="mb-4">
+                    <p class="text-gray-300 mb-2">1. Click eggs to smash them and win tokens</p>
+                    <p class="text-gray-300 mb-2">2. Catch walking chickens for bonus rewards</p>
+                    <p class="text-gray-300 mb-2">3. Different hammers give different chances</p>
+                    <p class="text-gray-300">4. Collect EGM tokens to upgrade your experience</p>
+                </div>
+            </div>
+
+            <!-- Game Background -->
+            <div class="game-bg"></div>
+
+            <!-- Egg Grid -->
+            <div id="eggGrid" class="egg-grid"></div>
+        </div>
+    </div>
+
+    <!-- Wallet Modal -->
+    <div id="walletModal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-2xl font-bold mb-6 text-yellow-400 text-center">Select Wallet</h2>
+            <div class="space-y-4">
+                <button class="wallet-option w-full" onclick="connectSpecificWallet('metamask')">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" 
+                         alt="MetaMask" class="w-8 h-8">
+                    <span class="text-lg">MetaMask</span>
+                </button>
+                <button class="wallet-option w-full" onclick="connectSpecificWallet('okx')">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/OKX_logo.svg" 
+                         alt="OKX" class="w-8 h-8">
+                    <span class="text-lg">OKX Wallet</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+<div class="loader"></div>
+    </div>
+
+    <script>
+        // Initialize GSAP plugins
+        gsap.registerPlugin(MotionPathPlugin);
+
+        // Global Variables
+        let web3;
+        let account;
+        let gameContract;
+        let tokenContract;
+        let globalClickCount = 0;
+        let chickenInterval;
+        let danceVideoInterval;
+
+        // Contract Addresses
+        const GAME_CONTRACT_ADDRESS = '0x77DBA8307397c1f0AACb608174d24b187ED5FDF8';
+        const TOKEN_CONTRACT_ADDRESS = '0xDE5a242a7E6fEc53678c44BEc219bcd6971c52fB';
+
+        // Contract ABIs
+        const gameABI = [
+            {
+                "inputs": [{"internalType": "address","name": "_tokenAddress","type": "address"}],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "inputs": [{"internalType": "address","name": "user","type": "address"}],
+                "name": "hasHammer",
+                "outputs": [{"internalType": "bool","name": "","type": "bool"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address","name": "user","type": "address"}],
+                "name": "getUserHammerType",
+                "outputs": [{"internalType": "enum EggGame.HammerType","name": "","type": "uint8"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "bool","name": "isAdvanced","type": "bool"}],
+                "name": "mintHammer",
+                "outputs": [],
+                "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "smashEgg",
+                "outputs": [
+                    {"internalType": "bool","name": "","type": "bool"},
+                    {"internalType": "uint256","name": "","type": "uint256"}
+                ],
+                "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "startChickenSession",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {"internalType": "address","name": "player","type": "address"},
+                    {"internalType": "uint256","name": "clicks","type": "uint256"}
+                ],
+                "name": "recordChickenClicks",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": false,
+                        "internalType": "address",
+                        "name": "player",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "tokenId",
+                        "type": "uint256"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "enum EggGame.HammerType",
+                        "name": "hammerType",
+                        "type": "uint8"
+                    }
+                ],
+                "name": "HammerMinted",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": false,
+                        "internalType": "address",
+                        "name": "player",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "bool",
+                        "name": "won",
+                        "type": "bool"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "prizeAmount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "EggSmashed",
+                "type": "event"
+            }
+        ];
+
+        const tokenABI = [
+            {
+                "inputs": [],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "inputs": [{"internalType": "address","name": "account","type": "address"}],
+                "name": "balanceOf",
+                "outputs": [{"internalType": "uint256","name": "","type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "decimals",
+                "outputs": [{"internalType": "uint8","name": "","type": "uint8"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "symbol",
+                "outputs": [{"internalType": "string","name": "","type": "string"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "name",
+                "outputs": [{"internalType": "string","name": "","type": "string"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {"internalType": "address","name": "to","type": "uint256"},
+                    {"internalType": "uint256","name": "amount","type": "uint256"}
+                ],
+                "name": "mint",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ];
+
+        // Game Effects Array
+        const gameEffects = [
+            () => showTokenWin(100),               // 1. Win 100 tokens
+            () => showTokenWin(200),               // 2. Win 200 tokens
+            createFantasyExplosion,                // 3. Fantasy explosion effect
+            createCoinRain,                        // 4. Coin rain effect
+            createMagicPortal,                     // 5. Magic portal effect
+            createMagicSpell,                      // 6. Magic spell effect
+            createColorVortex,                     // 7. Color vortex effect
+            createCrystalBreak,                    // 8. Crystal break effect
+            createEnergyWave,                      // 9. Energy wave effect
+            createStarDance,                       // 10. Star dance effect
+            createCrystalBurst,                    // 11. Crystal burst effect
+            createFireVortex,                      // 12. Fire vortex effect
+            createRainbowSplash,                   // 13. Rainbow splash effect
+            createLightningStorm,                  // 14. Lightning storm effect
+            createGalaxySpin                       // 15. Galaxy spin effect
+        ];
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const welcomeVideo = document.getElementById('welcomeVideo');
+            
+            if (welcomeVideo) {
+                welcomeVideo.play().catch(function(err) {
+                    console.log('Autoplay prevented:', err);
+                    showPlayButton();
+                });
+
+                welcomeVideo.addEventListener('ended', function() {
+                    animateWelcomeText();
+                });
+            }
+
+            initGeometricBackground();
+            
+            if (typeof window.ethereum !== 'undefined' && window.ethereum.selectedAddress) {
+                setupWallet(window.ethereum, window.ethereum.selectedAddress);
+            }
+
+            startDanceVideoInterval();
+        });
+
+        function showPlayButton() {
+            const playButton = document.createElement('button');
+            playButton.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 px-8 py-4 bg-yellow-400 rounded-full text-black text-xl hover:bg-yellow-300 transition-colors';
+            playButton.textContent = 'Play Video';
+            playButton.onclick = function() {
+                const video = document.getElementById('welcomeVideo');
+                if (video) {
+                    video.play();
+                    playButton.remove();
+                }
+            };
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            if (welcomeScreen) {
+                welcomeScreen.appendChild(playButton);
+            }
+        }
+
+        function animateWelcomeText() {
+            const welcomeContent = document.querySelector('.welcome-content');
+            const welcomeText = document.querySelector('.welcome-text');
+            const onixiaText = document.querySelector('.onixia-text');
+            const enterButton = document.querySelector('.enter-button');
+
+            if (!welcomeContent || !welcomeText || !onixiaText || !enterButton) return;
+
+            gsap.timeline()
+                .to(welcomeContent, {
+                    opacity: 1,
+                    scale: 1,
+                    duration: 1,
+                    ease: "back.out(1.7)"
+                })
+                .to(welcomeText, {
+                    opacity: 1,
+                    scale: 1,
+                    duration: 1,
+                    ease: "back.out(1.7)"
+                })
+                .to(onixiaText, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.8,
+                    ease: "power2.out"
+                })
+                .to(enterButton, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.8,
+                    ease: "power2.out"
+                })
+                .to([welcomeText, onixiaText], {
+                    y: "+=10",
+                    yoyo: true,
+                    repeat: -1,
+                    duration: 2,
+                    ease: "power1.inOut"
+                });
+        }
+
+        function initGeometricBackground() {
+            const bg = document.getElementById('geometricBg');
+            if (!bg) return;
+
+            for (let i = 0; i < 20; i++) {
+                const shape = document.createElement('div');
+                shape.className = 'geometric-shape';
+                shape.style.width = Math.random() * 200 + 100 + 'px';
+                shape.style.height = Math.random() * 200 + 100 + 'px';
+                shape.style.left = Math.random() * 100 + 'vw';
+                shape.style.top = Math.random() * 100 + 'vh';
+                shape.style.transform = `rotate(${Math.random() * 360}deg)`;
+                bg.appendChild(shape);
+            }
+        }
+
+        function startDanceVideoInterval() {
+            danceVideoInterval = setInterval(playRandomDanceVideo, 300000); // Every 5 minutes
+        }
+
+        function playRandomDanceVideo() {
+            const container = document.getElementById('danceVideoContainer');
+            const video = document.getElementById('danceVideo');
+            
+            if (!container || !video) return;
+
+            const positions = [
+                { top: '20px', right: '20px' },
+                { top: '20px', left: '20px' },
+                { bottom: '20px', right: '20px' },
+                { bottom: '20px', left: '20px' }
+            ];
+            
+            const position = positions[Math.floor(Math.random() * positions.length)];
+            Object.assign(container.style, position);
+
+            gsap.to(container, {
+                opacity: 1,
+                duration: 0.5,
+                onComplete: () => {
+                    video.play();
+                    setTimeout(() => {
+                        gsap.to(container, {
+                            opacity: 0,
+                            duration: 0.5
+                        });
+                    }, 3000);
+                }
+            });
+        }
+
+        function startGame() {
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            const gameContainer = document.getElementById('gameContainer');
+            const nftSection = document.getElementById('nftSection');
+
+            if (!welcomeScreen || !gameContainer || !nftSection) return;
+
+            gsap.to(welcomeScreen, {
+                opacity: 0,
+                duration: 1,
+                ease: "power2.inOut",
+                onComplete: function() {
+                    welcomeScreen.style.display = 'none';
+                    gameContainer.classList.remove('hidden');
+                    nftSection.classList.remove('hidden');
+                }
+            });
+        }
+
+        function showWalletModal() {
+            const modal = document.getElementById('walletModal');
+            if (!modal) return;
+
+            modal.style.display = 'flex';
+            const content = modal.querySelector('.modal-content');
+            if (content) {
+                gsap.to(content, {
+                    scale: 1,
+                    opacity: 1,
+                    duration: 0.3,
+                    ease: "back.out(1.7)"
+                });
+            }
+        }
+
+        function closeWalletModal() {
+            const modal = document.getElementById('walletModal');
+            if (!modal) return;
+
+            const content = modal.querySelector('.modal-content');
+            if (content) {
+                gsap.to(content, {
+                    scale: 0.9,
+                    opacity: 0,
+                    duration: 0.2,
+                    onComplete: function() {
+                        modal.style.display = 'none';
+                    }
+                });
+            }
+        }
+
+        async function connectSpecificWallet(type) {
+            showLoading();
+            try {
+                if (type === 'metamask' && window.ethereum) {
+                    await connectMetaMask();
+                } else if (type === 'okx' && window.okxwallet) {
+                    await connectOKX();
+                } else {
+                    throw new Error(`${type} wallet not installed`);
+                }
+                closeWalletModal();
+            } catch (error) {
+                console.error(error);
+                showError(`Failed to connect ${type}`);
+            }
+            hideLoading();
+        }
+
+        async function connectMetaMask() {
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                await setupWallet(window.ethereum, accounts[0]);
+            } catch (error) {
+                throw new Error('MetaMask connection failed');
+            }
+        }
+
+        async function connectOKX() {
+            try {
+                const accounts = await window.okxwallet.request({ method: 'eth_requestAccounts' });
+                await setupWallet(window.okxwallet, accounts[0]);
+            } catch (error) {
+                throw new Error('OKX Wallet connection failed');
+            }
+        }
+
+        async function setupWallet(provider, userAccount) {
+            web3 = new Web3(provider);
+            account = userAccount;
+
+            try {
+                await switchToBerachainbArtio(provider);
+                initializeContracts();
+                await updateUI();
+                
+                provider.on('accountsChanged', function(accounts) {
+                    if (accounts.length === 0) {
+                        disconnectWallet();
+                    } else {
+                        account = accounts[0];
+                        updateUI();
+                    }
+                });
+                
+                provider.on('chainChanged', function() {
+                    window.location.reload();
+                });
+
+                showSuccess('Wallet connected successfully');
+            } catch (error) {
+                console.error('Wallet setup failed:', error);
+                showError('Failed to setup wallet');
+                throw error;
+            }
+        }
+
+        async function switchToBerachainbArtio(provider) {
+            try {
+                await provider.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: '0x138d4' }]
+                });
+            } catch (switchError) {
+                if (switchError.code === 4902) {
+                    await provider.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [{
+                            chainId: '0x138d4',
+                            chainName: 'BerachainbArtio',
+                            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+                            rpcUrls: ['https://bera-testnet.nodeinfra.com'],
+                            blockExplorerUrls: ['https://bartio.beratrail.io']
+                        }]
+                    });
+                } else {
+                    throw switchError;
+                }
+            }
+        }
+
+        function initializeContracts() {
+            if (!web3) return;
+            gameContract = new web3.eth.Contract(gameABI, GAME_CONTRACT_ADDRESS);
+tokenContract = new web3.eth.Contract(tokenABI, TOKEN_CONTRACT_ADDRESS);
+        }
+
+        async function updateUI() {
+            if (!account) return;
+            
+            const connectButton = document.getElementById('connectButton');
+            if (connectButton) {
+                connectButton.innerHTML = `${account.slice(0,6)}...${account.slice(-4)}`;
+                connectButton.onclick = disconnectWallet;
+            }
+            
+            const nftSection = document.getElementById('nftSection');
+            if (nftSection) {
+                nftSection.classList.remove('hidden');
+            }
+            
+            await Promise.all([
+                updateTokenBalance(),
+                checkNFTStatus()
+            ]);
+        }
+
+        async function updateTokenBalance() {
+            try {
+                const balance = await tokenContract.methods.balanceOf(account).call();
+                const tokenInfo = document.getElementById('tokenInfo');
+                const tokenBalance = document.getElementById('tokenBalance');
+                
+                if (tokenInfo && tokenBalance) {
+                    tokenInfo.classList.remove('hidden');
+                    
+                    gsap.to({value: 0}, {
+                        value: parseInt(web3.utils.fromWei(balance, 'ether')),
+                        duration: 2,
+                        ease: "power1.out",
+                        onUpdate: function() {
+                            tokenBalance.textContent = Math.floor(this.targets()[0].value);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error updating token balance:', error);
+            }
+        }
+
+        async function checkNFTStatus() {
+            try {
+                const hasHammer = await gameContract.methods.hasHammer(account).call();
+                const ownedNFTDisplay = document.getElementById('ownedNFTDisplay');
+                const nftType = document.getElementById('nftType');
+                
+                if (hasHammer) {
+                    const hammerType = await gameContract.methods.getUserHammerType(account).call();
+                    if (ownedNFTDisplay && nftType) {
+                        ownedNFTDisplay.classList.remove('hidden');
+                        nftType.textContent = hammerType === "0" ? "Basic Hammer" : "Advanced Hammer";
+
+                        const enterGameButton = document.getElementById('enterGameButton');
+                        if (enterGameButton) {
+                            enterGameButton.disabled = false;
+                        }
+                    }
+                } else if (ownedNFTDisplay && nftType) {
+                    ownedNFTDisplay.classList.remove('hidden');
+                    nftType.textContent = "No Hammer - Mint one to play!";
+                    const enterGameButton = document.getElementById('enterGameButton');
+                    if (enterGameButton) {
+                        enterGameButton.disabled = true;
+                    }
+                }
+
+                document.querySelectorAll('.nft-card button').forEach(button => {
+                    button.textContent = hasHammer ? 'Replace Current Hammer' : 
+                        button.textContent.includes('Advanced') ? 'Mint Advanced Hammer' : 'Mint Basic Hammer';
+                });
+            } catch (error) {
+                console.error('Error checking NFT status:', error);
+                return null;
+            }
+        }
+
+        function disconnectWallet() {
+            web3 = null;
+            account = null;
+            gameContract = null;
+            tokenContract = null;
+            
+            const connectButton = document.getElementById('connectButton');
+            if (connectButton) {
+                connectButton.innerHTML = 'Connect Wallet';
+                connectButton.onclick = showWalletModal;
+            }
+            
+            const tokenInfo = document.getElementById('tokenInfo');
+            if (tokenInfo) {
+                tokenInfo.classList.add('hidden');
+            }
+            
+            const ownedNFTDisplay = document.getElementById('ownedNFTDisplay');
+            if (ownedNFTDisplay) {
+                ownedNFTDisplay.classList.add('hidden');
+            }
+            
+            document.querySelectorAll('.nft-card button').forEach(button => {
+                button.disabled = false;
+                button.textContent = button.textContent.includes('Advanced') ? 
+                    'Mint Advanced Hammer' : 'Mint Basic Hammer';
+            });
+
+            showSuccess('Wallet disconnected');
+        }
+
+        async function mintHammer(isAdvanced) {
+            if (!web3 || !account) return;
+            
+            const button = event.target;
+            showLoading();
+            
+            try {
+                const price = isAdvanced ? 
+                    web3.utils.toWei('0.00005', 'ether') : 
+                    web3.utils.toWei('0.00002', 'ether');
+                
+                const result = await gameContract.methods.mintHammer(isAdvanced).send({
+                    from: account,
+                    value: price
+                });
+
+                if (result.status) {
+                    showSuccess('Hammer minted successfully!');
+                    
+                    const card = button.closest('.nft-card');
+                    if (card) {
+                        await gsap.timeline()
+                            .to(card, {
+                                scale: 1.05,
+                                duration: 0.3,
+                                ease: "back.out(1.7)"
+                            })
+                            .to(card, {
+                                boxShadow: "0 0 30px rgba(255, 215, 0, 0.5)",
+                                duration: 0.3
+                            })
+                            .to(card, {
+                                scale: 1,
+                                boxShadow: "none",
+                                duration: 0.3
+                            });
+                    }
+                        
+                    await checkNFTStatus();
+                    await updateTokenBalance();
+                }
+            } catch (error) {
+                console.error('Mint error:', error);
+                showError('Failed to mint hammer');
+            } finally {
+hideLoading();
+            }
+        }
+
+function startGamePhase() {
+    const nftSection = document.getElementById('nftSection');
+    const ownedNFTDisplay = document.getElementById('ownedNFTDisplay');
+    
+    if (!nftSection || !ownedNFTDisplay) return;
+
+    gsap.to([nftSection, ownedNFTDisplay], {
+        opacity: 0,
+        duration: 0.5,
+        onComplete: function() {
+            nftSection.style.display = 'none';
+            ownedNFTDisplay.style.display = 'none';
+            
+            const videoContainer = document.createElement('div');
+            videoContainer.className = 'fixed inset-0 z-50 bg-black';
+            const video = document.createElement('video');
+            video.src = 'welcome2.mp4';
+            video.className = 'w-full h-full object-cover';
+            video.muted = true;
+            video.autoplay = true;
+            videoContainer.appendChild(video);
+            document.body.appendChild(videoContainer);
+
+            video.onended = function() {
+                gsap.to(videoContainer, {
+                    opacity: 0,
+                    duration: 0.5,
+                    onComplete: function() {
+                        videoContainer.remove();
+                        initializeGameBoard();
+                        // اینجا به جای startChickenGame از تابع جدید استفاده میکنیم
+                        startChickenSpawning();
+                    }
+                });
+            };
+        }
+    });
+}
+
+function startChickenSpawning() {
+    if (chickenInterval) clearInterval(chickenInterval);
+    
+    globalClickCount = 0;
+    const clickCounter = document.getElementById('clickCounter');
+    if (clickCounter) {
+        clickCounter.classList.remove('hidden');
+        clickCounter.querySelector('#clickCount').textContent = '0';
+    }
+    createWalkingChicken();
+    
+    // ایجاد جوجه‌های بعدی هر 10 ثانیه
+    chickenInterval = setInterval(() => {
+        if (Math.random() < 0.3) { // 30% احتمال ظاهر شدن
+            createWalkingChicken();
+        }
+    }, 10000);
+}
+
+        function toggleInfoPanel() {
+            const panel = document.getElementById('infoPanel');
+            panel.classList.toggle('active');
+        }
+
+function returnToNFTSection() {
+    if (chickenInterval) {
+        clearInterval(chickenInterval);
+        chickenInterval = null;
+    }
+
+    const gameBoard = document.getElementById('gameBoard');
+    const nftSection = document.getElementById('nftSection');
+    const ownedNFTDisplay = document.getElementById('ownedNFTDisplay');
+    const clickCounter = document.getElementById('clickCounter');
+    
+    if (!gameBoard || !nftSection || !ownedNFTDisplay) return;
+
+    gsap.to(gameBoard, {
+        opacity: 0,
+        duration: 0.5,
+        onComplete: function() {
+            gameBoard.classList.add('hidden');
+            if (clickCounter) clickCounter.classList.add('hidden');
+            
+            nftSection.style.display = '';
+            ownedNFTDisplay.style.display = '';
+            
+            gsap.to([nftSection, ownedNFTDisplay], {
+                opacity: 1,
+                duration: 0.5,
+                stagger: 0.2
+            });
+        }
+    });
+}
+
+        function initializeGameBoard() {
+            const gameBoard = document.getElementById('gameBoard');
+            const eggGrid = document.getElementById('eggGrid');
+            if (!gameBoard || !eggGrid) return;
+
+            gameBoard.classList.remove('hidden');
+
+            const screenWidth = window.innerWidth;
+            const columns = screenWidth < 768 ? 3 : 5;
+            const eggs = Array(columns * 2).fill().map((_, i) => `
+                <div class="egg cursor-pointer transform transition-all duration-300" data-index="${i}">
+                    <img src="egg.png" alt="Egg" class="w-full h-auto object-contain">
+                </div>
+            `).join('');
+
+            eggGrid.innerHTML = eggs;
+            eggGrid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+
+            document.querySelectorAll('.egg').forEach(egg => {
+                egg.addEventListener('click', async function() {
+                    if (this.classList.contains('processing')) return;
+                    await handleEggClick(this);
+                });
+            });
+
+            startChickenSpawning();
+            startDanceVideoInterval();
+        }
+
+        function startChickenSpawning() {
+            if (chickenInterval) clearInterval(chickenInterval);
+            
+            chickenInterval = setInterval(() => {
+                if (Math.random() < 0.3) {
+                    createWalkingChicken();
+                }
+            }, 10000);
+        }
+
+function createWalkingChicken() {
+    const gameBoard = document.getElementById('gameBoard');
+    if (!gameBoard) return;
+
+    const chicken = document.createElement('div');
+    chicken.className = 'walking-chicken';
+    chicken.innerHTML = `
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <g class="chicken-body">
+                <ellipse cx="50" cy="60" rx="30" ry="25" fill="#f4a460"/>
+                <circle cx="75" cy="40" r="15" fill="#f4a460"/>
+                <circle cx="80" cy="35" r="3" fill="black"/>
+                <path d="M85 40 L95 45 L85 50 Z" fill="orange"/>
+                <g class="wing">
+                    <path d="M40 50 Q50 30 60 50" fill="#deb887"/>
+                </g>
+                <g class="legs">
+                    <path d="M40 80 L40 90" stroke="#8b4513" stroke-width="3"/>
+                    <path d="M60 80 L60 90" stroke="#8b4513" stroke-width="3"/>
+                </g>
+            </g>
+        </svg>
+    `;
+
+    gameBoard.appendChild(chicken);
+
+    // تعیین نقطه شروع رندوم
+    const startPositions = [
+        { x: -60, y: Math.random() * (gameBoard.clientHeight - 100), direction: 1 },  // از چپ
+        { x: gameBoard.clientWidth + 60, y: Math.random() * (gameBoard.clientHeight - 100), direction: -1 },  // از راست
+        { x: Math.random() * gameBoard.clientWidth, y: -60, direction: Math.random() < 0.5 ? 1 : -1 }  // از بالا
+    ];
+
+    const startPos = startPositions[Math.floor(Math.random() * startPositions.length)];
+    let xPos = startPos.x;
+    let yPos = startPos.y;
+    let direction = startPos.direction;
+
+    chicken.style.position = 'absolute';
+    chicken.style.left = `${xPos}px`;
+    chicken.style.top = `${yPos}px`;
+
+    function animate() {
+        // حرکت افقی
+        xPos += 3 * direction;
+        
+        // حرکت عمودی نوسانی برای شبیه‌سازی پریدن
+        yPos += Math.sin(xPos / 30) * 1;
+        
+        chicken.style.left = `${xPos}px`;
+        chicken.style.top = `${yPos}px`;
+        chicken.style.transform = `scaleX(${direction})`;
+
+        // انیمیشن بال
+        const wing = chicken.querySelector('.wing');
+        if (wing) {
+            wing.style.transform = `rotate(${Math.sin(xPos / 10) * 20}deg)`;
+        }
+
+        // انیمیشن پاها
+        const legs = chicken.querySelectorAll('.legs path');
+        legs.forEach((leg, i) => {
+            leg.style.transform = `rotate(${Math.sin((xPos + i * Math.PI) / 10) * 20}deg)`;
+        });
+
+        // چک کردن مرزهای صفحه
+        if (xPos > gameBoard.clientWidth + 100 || xPos < -100 || yPos > gameBoard.clientHeight + 100 || yPos < -100) {
+            chicken.remove();
+            return;
+        }
+
+        if (chicken.isConnected) {
+            requestAnimationFrame(animate);
+        }
+    }
+
+    requestAnimationFrame(animate);
+
+    // هندل کلیک
+    chicken.addEventListener('click', () => {
+        globalClickCount++;
+        document.getElementById('clickCount').textContent = globalClickCount;
+        
+        gsap.to(chicken, {
+            scale: 1.2,
+            duration: 0.1,
+            yoyo: true,
+            repeat: 1
+        });
+    });
+
+    // حذف بعد از 10 ثانیه
+    setTimeout(() => {
+        if (chicken.isConnected) {
+            gsap.to(chicken, {
+                opacity: 0,
+                duration: 0.3,
+                onComplete: () => {
+                    chicken.remove();
+                    if (globalClickCount > 0) {
+                        showChickenReward();
+                    }
+                }
+            });
+        }
+    }, 10000);
+}
+
+// تنظیم فاصله زمانی ظهور جوجه‌ها
+function startChickenSpawning() {
+    if (chickenInterval) clearInterval(chickenInterval);
+    
+    globalClickCount = 0;
+    const clickCounter = document.getElementById('clickCounter');
+    if (clickCounter) {
+        clickCounter.classList.remove('hidden');
+        clickCounter.querySelector('#clickCount').textContent = '0';
+    }
+
+    // ظهور جوجه هر 5 تا 15 ثانیه به صورت رندوم
+    function spawnWithRandomInterval() {
+        const minDelay = 5000;  // حداقل 5 ثانیه
+        const maxDelay = 15000; // حداکثر 15 ثانیه
+        const randomDelay = Math.random() * (maxDelay - minDelay) + minDelay;
+
+        setTimeout(() => {
+            if (Math.random() < 0.7) { // 70% احتمال ظهور
+                createWalkingChicken();
+            }
+            spawnWithRandomInterval();
+        }, randomDelay);
+    }
+
+    // شروع فرآیند
+    spawnWithRandomInterval();
+}
+
+        async function handleEggClick(eggElement) {
+            if (!web3 || !account || !eggElement || eggElement.classList.contains('processing')) return;
+            
+            eggElement.classList.add('processing');
+            const waitingAnimation = document.createElement('div');
+            waitingAnimation.className = 'waiting-animation';
+            document.body.appendChild(waitingAnimation);
+
+            try {
+                const result = await gameContract.methods.smashEgg().send({
+                    from: account,
+                    value: web3.utils.toWei('0.000001', 'ether')
+                });
+
+                waitingAnimation.remove();
+
+                if (result.status) {
+                    // Choose and apply random effect
+                    const randomEffect = gameEffects[Math.floor(Math.random() * gameEffects.length)];
+                    await randomEffect();
+                }
+            } catch (error) {
+                console.error('Transaction failed:', error);
+                showError('Transaction failed. Please try again.');
+                waitingAnimation.remove();
+            } finally {
+                setTimeout(() => {
+                    eggElement.classList.remove('processing');
+                }, 1000);
+            }
+        }
+
+        async function showChickenReward() {
+            const container = document.createElement('div');
+            container.className = 'fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-80 reward-modal';
+            
+            container.innerHTML = `
+                <div class="bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 p-8 rounded-xl border-2 border-yellow-400 backdrop-blur-md">
+                    <h2 class="text-3xl font-bold text-yellow-400 mb-4">🐔 Nice Catch! 🐔</h2>
+                    <p class="text-xl text-white mb-6">You caught the chicken ${globalClickCount} times!</p>
+                    <div class="flex justify-center space-x-4">
+                        <button onclick="claimChickenReward(${globalClickCount})" 
+                                class="px-6 py-3 bg-yellow-400 text-black rounded-lg hover:bg-yellow-300 
+                                       transform hover:scale-105 transition-all">
+                            Claim ${globalClickCount} EGM Tokens
+                        </button>
+                        <button onclick="skipChickenReward()"
+                                class="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-500 
+                                       transform hover:scale-105 transition-all">
+                            Skip
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(container);
+
+            gsap.from(container.children[0], {
+                scale: 0.5,
+                opacity: 0,
+                duration: 0.5,
+                ease: "back.out(1.7)"
+            });
+        }
+
+        async function claimChickenReward(clicks) {
+            if (!web3 || !account || clicks === 0) return;
+            
+            const waitingAnimation = document.createElement('div');
+            waitingAnimation.className = 'waiting-animation';
+            document.body.appendChild(waitingAnimation);
+            
+            try {
+                await gameContract.methods.recordChickenClicks(account, clicks).send({
+                    from: account
+                });
+                showSuccess(`${clicks} tokens claimed successfully!`);
+                await updateTokenBalance();
+                globalClickCount = 0;
+                
+                const clickCountDisplay = document.getElementById('clickCount');
+                if (clickCountDisplay) {
+                    clickCountDisplay.textContent = '0';
+                }
+                
+                hideChickenRewardModal();
+            } catch (error) {
+                console.error('Error claiming chicken reward:', error);
+                showError('Failed to claim reward');
+            } finally {
+                waitingAnimation.remove();
+            }
+        }
+
+        function skipChickenReward() {
+            globalClickCount = 0;
+            const clickCountDisplay = document.getElementById('clickCount');
+            if (clickCountDisplay) {
+                clickCountDisplay.textContent = '0';
+            }
+            hideChickenRewardModal();
+        }
+
+        function hideChickenRewardModal() {
+            const container = document.querySelector('.reward-modal');
+            if (container) {
+                gsap.to(container, {
+                    opacity: 0,
+                    duration: 0.3,
+                    onComplete: () => container.remove()
+                });
+            }
+        }
+
+        // Game Effects Functions
+        async function showTokenWin(amount) {
+            showSuccess(`Congratulations! You won ${amount} EGM tokens!`);
+            await updateTokenBalance();
+        }
+
+        function createFantasyExplosion() {
+            return new Promise((resolve) => {
+                const container = document.createElement('div');
+                container.className = 'fantasy-explosion';
+                
+                for (let i = 0; i < 50; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    const size = Math.random() * 20 + 10;
+                    const color = `hsl(${Math.random() * 60 + 30}, 100%, 50%)`;
+                    
+                    particle.style.cssText = `
+                        width: ${size}px;
+                        height: ${size}px;
+                        background: ${color};
+                        border-radius: 50%;
+                        position: absolute;
+                        left: 50%;
+                        top: 50%;
+                        transform: translate(-50%, -50%);
+                    `;
+                    
+                    container.appendChild(particle);
+                    
+                    gsap.to(particle, {
+                        x: (Math.random() - 0.5) * window.innerWidth,
+                        y: (Math.random() - 0.5) * window.innerHeight,
+                        scale: 0,
+                        duration: Math.random() * 2 + 1,
+                        ease: "power2.out"
+                    });
+                }
+
+                document.body.appendChild(container);
+                
+                setTimeout(() => {
+                    gsap.to(container, {
+                        opacity: 0,
+                        duration: 0.5,
+                        onComplete: () => {
+                            container.remove();
+                            resolve();
+                        }
+                    });
+                }, 2000);
+            });
+        }
+
+        function createCoinRain() {
+            return new Promise((resolve) => {
+                const container = document.createElement('div');
+                container.className = 'coin-rain';
+                
+                for (let i = 0; i < 50; i++) {
+                    const coin = document.createElement('div');
+                    coin.className = 'particle';
+                    const size = Math.random() * 30 + 20;
+                    
+                    coin.style.cssText = `
+                        width: ${size}px;
+                        height: ${size}px;
+                        background: radial-gradient(circle at 30% 30%, #FFD700, #FFA500);
+                        border-radius: 50%;
+                        position: absolute;
+                        left: ${Math.random() * 100}vw;
+                        top: -50px;
+                    `;
+                    
+                    container.appendChild(coin);
+                    
+                    gsap.to(coin, {
+                        y: window.innerHeight + 100,
+                        rotation: Math.random() * 720,
+                        duration: Math.random() * 2 + 1,
+                        delay: Math.random() * 0.5,
+                        ease: "bounce.out"
+                    });
+                }
+
+                document.body.appendChild(container);
+                
+                setTimeout(() => {
+                    gsap.to(container, {
+                        opacity: 0,
+                        duration: 0.5,
+                        onComplete: () => {
+                            container.remove();
+                            resolve();
+                        }
+                    });
+                }, 3000);
+            });
+        }
+
+        function createMagicPortal() {
+            return new Promise((resolve) => {
+                const container = document.createElement('div');
+                container.className = 'magic-portal';
+                
+                const rings = 5;
+                for (let i = 0; i < rings; i++) {
+                    const ring = document.createElement('div');
+                    ring.style.cssText = `
+                        position: absolute;
+                        border: 4px solid ${`hsl(${i * 60}, 100%, 70%)`};
+                        border-radius: 50%;
+                        left: 50%;
+                        top: 50%;
+                        transform: translate(-50%, -50%);
+                        width: 0;
+                        height: 0;
+                    `;
+                    container.appendChild(ring);
+
+                    gsap.to(ring, {
+                        width: Math.min(window.innerWidth, window.innerHeight),
+                        height: Math.min(window.innerWidth, window.innerHeight),
+                        opacity: 0,
+                        duration: 2,
+                        delay: i * 0.2,
+                        ease: "power2.out"
+                    });
+                }
+
+                document.body.appendChild(container);
+                
+                setTimeout(() => {
+                    container.remove();
+                    resolve();
+                }, 3000);
+            });
+        }
+
+        function createMagicSpell() {
+            return new Promise((resolve) => {
+                const container = document.createElement('div');
+                container.className = 'magic-spell';
+                
+                const symbols = 20;
+                const magicSymbols = '✦✧★☆✴✵✶✷';
+                
+                for (let i = 0; i < symbols; i++) {
+                    const symbol = document.createElement('div');
+                    symbol.textContent = magicSymbols[Math.floor(Math.random() * magicSymbols.length)];
+                    symbol.style.cssText = `
+                        position: absolute;
+                        color: ${`hsl(${Math.random() * 60 + 240}, 100%, 70%)`};
+                        font-size: ${Math.random() * 30 + 20}px;
+                        left: ${Math.random() * 100}vw;
+                        top: ${Math.random() * 100}vh;
+                        opacity: 0;
+                    `;
+                    
+                    container.appendChild(symbol);
+                    
+                    gsap.to(symbol, {
+                        opacity: 1,
+                        scale: 2,
+                        rotation: 360,
+                        duration: 1,
+                        ease: "power2.inOut",
+                        yoyo: true,
+                        repeat: 1
+                    });
+                }
+
+                document.body.appendChild(container);
+                
+                setTimeout(() => {
+                    gsap.to(container, {
+                        opacity: 0,
+                        duration: 0.5,
+                        onComplete: () => {
+                            container.remove();
+                            resolve();
+                        }
+                    });
+                }, 2500);
+            });
+        }
+
+        function createColorVortex() {
+            return new Promise((resolve) => {
+                const container = document.createElement('div');
+                container.className = 'color-vortex';
+                
+                const lines = 36;
+                for (let i = 0; i < lines; i++) {
+                    const line = document.createElement('div');
+                    line.style.cssText = `
+                        position: absolute;
+                        width: 2px;
+                        height: 100vh;
+                        background: linear-gradient(to bottom, 
+                            hsl(${i * 10}, 100%, 50%), 
+                            transparent);
+                        left: 50%;
+                        top: 50%;
+                        transform-origin: center;
+                        transform: rotate(${i * (360 / lines)}deg);
+                        opacity: 0;
+                    `;
+                    
+                    container.appendChild(line);
+                    
+                    gsap.to(line, {
+                        opacity: 1,
+                        duration: 0.5
+                    });
+                    
+                    gsap.to(line, {
+                        rotation: `+=${360}`,
+                        duration: 2,
+                        ease: "none"
+                    });
+                }
+
+                document.body.appendChild(container);
+                
+                setTimeout(() => {
+                    gsap.to(container, {
+                        opacity: 0,
+                        duration: 0.5,
+                        onComplete: () => {
+                            container.remove();
+                            resolve();
+                        }
+                    });
+                }, 2500);
+            });
+        }
+
+        function createCrystalBreak() {
+            return new Promise((resolve) => {
+                const container = document.createElement('div');
+                container.className = 'crystal-break';
+                
+                const shards = 30;
+                for (let i = 0; i < shards; i++) {
+                    const shard = document.createElement('div');
+                    const size = Math.random() * 40 + 20;
+                    
+                    shard.style.cssText = `
+                        position: absolute;
+                        width: ${size}px;
+                        height: ${size}px;
+                        background: linear-gradient(135deg, 
+                            rgba(255,255,255,0.8), 
+                            rgba(173,216,230,0.6));
+                        clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+                        left: 50%;
+                        top: 50%;
+                        transform: translate(-50%, -50%);
+                    `;
+                    
+                    container.appendChild(shard);
+                    
+                    gsap.to(shard, {
+                        x: (Math.random() - 0.5) * window.innerWidth * 0.8,
+                        y: (Math.random() - 0.5) * window.innerHeight * 0.8,
+                        rotation: Math.random() * 720 - 360,
+                        opacity: 0,
+                        duration: Math.random() * 1 + 1,
+                        ease: "power2.out"
+                    });
+                }
+
+                document.body.appendChild(container);
+                
+                setTimeout(() => {
+                    container.remove();
+                    resolve();
+                }, 2500);
+            });
+        }
+function createCrystalBurst() {
+    return new Promise((resolve) => {
+        const container = document.createElement('div');
+        container.className = 'crystal-burst';
+        
+        for (let i = 0; i < 20; i++) {
+            const crystal = document.createElement('div');
+            const size = Math.random() * 50 + 20;
+            crystal.style.cssText = `
+                position: absolute;
+                width: ${size}px;
+                height: ${size}px;
+                background: linear-gradient(135deg, #e6f0ff, #b3d9ff);
+                clip-path: polygon(50% 0%, 80% 50%, 50% 100%, 20% 50%);
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            `;
+            
+            container.appendChild(crystal);
+            
+            gsap.to(crystal, {
+                x: (Math.random() - 0.5) * window.innerWidth,
+                y: (Math.random() - 0.5) * window.innerHeight,
+                rotation: Math.random() * 720 - 360,
+                scale: 0,
+                duration: Math.random() * 2 + 1,
+                ease: "power2.out"
+            });
+        }
+
+        document.body.appendChild(container);
+        
+        setTimeout(() => {
+            container.remove();
+            resolve();
+        }, 3000);
+    });
+}
+
+function createLightningStorm() {
+    return new Promise((resolve) => {
+        const container = document.createElement('div');
+        container.className = 'lightning-storm';
+        
+        for (let i = 0; i < 5; i++) {
+            const lightning = document.createElement('div');
+            lightning.style.cssText = `
+                position: absolute;
+                width: 3px;
+                height: 0;
+                background: white;
+                left: ${Math.random() * 100}vw;
+                top: 0;
+                filter: blur(1px);
+                box-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px yellow;
+            `;
+            
+            container.appendChild(lightning);
+            
+            gsap.to(lightning, {
+                height: '100vh',
+                duration: 0.1,
+                delay: i * 0.2,
+                yoyo: true,
+                repeat: 1
+            });
+        }
+
+        document.body.appendChild(container);
+        
+        setTimeout(() => {
+            container.remove();
+            resolve();
+        }, 2000);
+    });
+}
+
+function createDiamondShower() {
+    return new Promise((resolve) => {
+        const container = document.createElement('div');
+        container.className = 'diamond-shower';
+        
+        for (let i = 0; i < 30; i++) {
+            const diamond = document.createElement('div');
+            const size = Math.random() * 30 + 10;
+            diamond.style.cssText = `
+                position: absolute;
+                width: ${size}px;
+                height: ${size}px;
+                background: linear-gradient(45deg, #fafafa, #f0f0f0);
+                clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+                left: ${Math.random() * 100}vw;
+                top: -50px;
+            `;
+            
+            container.appendChild(diamond);
+            
+            gsap.to(diamond, {
+                y: window.innerHeight + 100,
+                rotation: Math.random() * 360,
+                duration: Math.random() * 2 + 1,
+                delay: Math.random(),
+                ease: "power1.in"
+            });
+        }
+
+        document.body.appendChild(container);
+        
+        setTimeout(() => {
+            container.remove();
+            resolve();
+        }, 3000);
+    });
+}
+
+function createGoldenFractal() {
+    return new Promise((resolve) => {
+        const container = document.createElement('div');
+        container.className = 'golden-fractal';
+        
+        function createBranch(x, y, length, angle, depth) {
+            if (depth <= 0) return;
+            
+            const endX = x + length * Math.cos(angle);
+            const endY = y + length * Math.sin(angle);
+            
+            const branch = document.createElement('div');
+            branch.style.cssText = `
+                position: absolute;
+                width: ${length}px;
+                height: 2px;
+                background: linear-gradient(to right, #FFD700, transparent);
+                left: ${x}px;
+                top: ${y}px;
+                transform-origin: left center;
+                transform: rotate(${angle}rad);
+            `;
+            
+            container.appendChild(branch);
+            
+            gsap.from(branch, {
+                scaleX: 0,
+                duration: 0.5,
+                delay: (5 - depth) * 0.2
+            });
+            
+            createBranch(endX, endY, length * 0.8, angle - Math.PI / 4, depth - 1);
+            createBranch(endX, endY, length * 0.8, angle + Math.PI / 4, depth - 1);
+        }
+        
+        createBranch(window.innerWidth / 2, window.innerHeight / 2, 100, -Math.PI / 2, 5);
+        
+        document.body.appendChild(container);
+        
+        setTimeout(() => {
+            container.remove();
+            resolve();
+        }, 3000);
+    });
+}
+        function createEnergyWave() {
+            return new Promise((resolve) => {
+                const container = document.createElement('div');
+                container.className = 'energy-wave';
+                
+                const rings = 8;
+                for (let i = 0; i < rings; i++) {
+                    const ring = document.createElement('div');
+                    ring.style.cssText = `
+                        position: absolute;
+                        border: 2px solid ${`hsl(${i * 30 + 180}, 100%, 70%)`};
+                        border-radius: 50%;
+                        left: 50%;
+                        top: 50%;
+                        transform: translate(-50%, -50%) scale(0);
+                        width: ${Math.min(window.innerWidth, window.innerHeight)}px;
+                        height: ${Math.min(window.innerWidth, window.innerHeight)}px;
+                        opacity: 1;
+                    `;
+                    
+                    container.appendChild(ring);
+                    
+                    gsap.to(ring, {
+                        scale: 1,
+                        opacity: 0,
+                        duration: 2,
+                        delay: i * 0.2,
+                        ease: "power2.out"
+                    });
+                }
+
+                document.body.appendChild(container);
+                
+                setTimeout(() => {
+                    container.remove();
+                    resolve();
+                }, 3000);
+            });
+        }
+
+        function createStarDance() {
+            return new Promise((resolve) => {
+const container = document.createElement('div');
+                container.className = 'star-dance';
+                
+                for (let i = 0; i < 40; i++) {
+                    const star = document.createElement('div');
+                    star.style.cssText = `
+                        position: absolute;
+                        width: 3px;
+                        height: 3px;
+                        background: white;
+                        box-shadow: 0 0 8px #FFD700;
+                        left: ${Math.random() * 100}vw;
+                        top: ${Math.random() * 100}vh;
+                        opacity: 0;
+                    `;
+                    
+                    container.appendChild(star);
+                    
+                    gsap.to(star, {
+                        opacity: 1,
+                        scale: Math.random() * 2 + 1,
+                        duration: 0.5,
+                        repeat: 3,
+                        yoyo: true,
+                        delay: Math.random()
+                    });
+                    
+                    gsap.to(star, {
+                        x: (Math.random() - 0.5) * 200,
+                        y: (Math.random() - 0.5) * 200,
+                        duration: 2,
+                        ease: "power1.inOut"
+                    });
+                }
+
+                document.body.appendChild(container);
+                
+                setTimeout(() => {
+                    gsap.to(container, {
+                        opacity: 0,
+                        duration: 0.5,
+                        onComplete: () => {
+                            container.remove();
+                            resolve();
+                        }
+                    });
+                }, 2500);
+            });
+        }
+
+        function createFireVortex() {
+            return new Promise((resolve) => {
+                const container = document.createElement('div');
+                container.className = 'fire-vortex';
+                
+                for (let i = 0; i < 100; i++) {
+                    const particle = document.createElement('div');
+                    particle.style.cssText = `
+                        position: absolute;
+                        width: ${Math.random() * 10 + 5}px;
+                        height: ${Math.random() * 10 + 5}px;
+                        background: hsl(${Math.random() * 60 + 10}, 100%, 50%);
+                        border-radius: 50%;
+                        left: 50%;
+                        top: 50%;
+                        transform: translate(-50%, -50%);
+                    `;
+                    
+                    container.appendChild(particle);
+                    
+                    gsap.to(particle, {
+                        x: (Math.random() - 0.5) * 200,
+                        y: (Math.random() - 0.5) * 200,
+                        scale: 0,
+                        rotation: Math.random() * 360,
+                        duration: Math.random() + 1,
+                        ease: "power2.out"
+                    });
+                }
+
+                document.body.appendChild(container);
+                
+                setTimeout(() => {
+                    gsap.to(container, {
+                        opacity: 0,
+                        duration: 0.5,
+                        onComplete: () => {
+                            container.remove();
+                            resolve();
+                        }
+                    });
+                }, 2000);
+            });
+        }
+
+        function createRainbowSplash() {
+            return new Promise((resolve) => {
+                const container = document.createElement('div');
+                container.className = 'rainbow-splash';
+                
+                const colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#8B00FF'];
+                
+                for (let i = 0; i < colors.length; i++) {
+                    const arc = document.createElement('div');
+                    arc.style.cssText = `
+                        position: absolute;
+                        width: ${100 + i * 50}px;
+                        height: ${100 + i * 50}px;
+                        border: 5px solid ${colors[i]};
+                        border-radius: 50%;
+                        left: 50%;
+                        top: 50%;
+                        transform: translate(-50%, -50%) scale(0);
+                    `;
+                    
+                    container.appendChild(arc);
+                    
+                    gsap.to(arc, {
+                        scale: 2,
+                        opacity: 0,
+                        duration: 1.5,
+                        delay: i * 0.1,
+                        ease: "power2.out"
+                    });
+                }
+
+                document.body.appendChild(container);
+                
+                setTimeout(() => {
+                    container.remove();
+                    resolve();
+                }, 2500);
+            });
+        }
+
+        function createLightningStorm() {
+            return new Promise((resolve) => {
+                const container = document.createElement('div');
+                container.className = 'lightning-storm';
+                
+                for (let i = 0; i < 5; i++) {
+                    const lightning = document.createElement('div');
+                    lightning.style.cssText = `
+                        position: absolute;
+                        width: 3px;
+                        height: 0;
+                        background: white;
+                        left: ${Math.random() * 100}vw;
+                        top: 0;
+                        filter: blur(1px);
+                        box-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px #FFD700;
+                        transform-origin: top;
+                    `;
+                    
+                    container.appendChild(lightning);
+                    
+                    gsap.to(lightning, {
+                        height: '100vh',
+                        duration: 0.1,
+                        delay: i * 0.2,
+                        yoyo: true,
+                        repeat: 1
+                    });
+                }
+
+                document.body.appendChild(container);
+                
+                setTimeout(() => {
+                    container.remove();
+                    resolve();
+                }, 2000);
+            });
+        }
+
+        function createGalaxySpin() {
+            return new Promise((resolve) => {
+                const container = document.createElement('div');
+                container.className = 'galaxy-spin';
+                
+                for (let i = 0; i < 200; i++) {
+                    const star = document.createElement('div');
+                    const distance = Math.random() * 300 + 100;
+                    const angle = Math.random() * Math.PI * 2;
+                    
+                    star.style.cssText = `
+                        position: absolute;
+                        width: ${Math.random() * 3 + 1}px;
+                        height: ${Math.random() * 3 + 1}px;
+                        background: white;
+                        left: 50%;
+                        top: 50%;
+                        box-shadow: 0 0 ${Math.random() * 5 + 2}px white;
+                        transform: translate(-50%, -50%) rotate(${angle}rad) translateX(${distance}px);
+                    `;
+                    
+                    container.appendChild(star);
+                    
+                    gsap.to(star, {
+                        rotation: '+=360',
+                        duration: 3,
+                        ease: "none"
+                    });
+                }
+
+                document.body.appendChild(container);
+                gsap.from(container, { opacity: 0, duration: 0.5 });
+                
+                setTimeout(() => {
+                    gsap.to(container, {
+                        opacity: 0,
+                        duration: 0.5,
+                        onComplete: () => {
+                            container.remove();
+                            resolve();
+                        }
+                    });
+                }, 3000);
+            });
+        }
+
+        function showLoading() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'flex';
+            }
+        }
+
+        function hideLoading() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'none';
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'notification error';
+            errorDiv.textContent = message;
+            
+            document.body.appendChild(errorDiv);
+            
+            gsap.fromTo(errorDiv,
+                { y: -100, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.5, ease: "back.out(1.7)" }
+            );
+
+            setTimeout(() => {
+                gsap.to(errorDiv, {
+                    y: -100,
+                    opacity: 0,
+                    duration: 0.5,
+                    onComplete: () => errorDiv.remove()
+                });
+            }, 3000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'notification success';
+            successDiv.textContent = message;
+            
+            document.body.appendChild(successDiv);
+            
+            gsap.fromTo(successDiv,
+                { y: -100, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.5, ease: "back.out(1.7)" }
+            );
+
+            setTimeout(() => {
+                gsap.to(successDiv, {
+                    y: -100,
+                    opacity: 0,
+                    duration: 0.5,
+                    onComplete: () => successDiv.remove()
+                });
+            }, 3000);
+        }
+
+        // Prevent video context menu
+        document.addEventListener('contextmenu', (e) => {
+            if (e.target.tagName === 'VIDEO') {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
