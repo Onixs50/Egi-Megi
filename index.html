@@ -561,7 +561,7 @@ to { transform: rotate(360deg); }
     <!-- Welcome Screen -->
     <div id="welcomeScreen" class="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center">
         <video id="welcomeVideo" class="absolute inset-0 w-full h-full object-cover" playsinline muted>
-            <source src="welcome.mp4" type="video/mp4">
+            <source src="https://github.com/Onixs50/Egi-Megi/raw/main/welcome.mp4" type="video/mp4">
         </video>
         <div class="relative z-10 text-center space-y-8 welcome-content">
             <h1 class="welcome-text">Welcome to EgiMegi</h1>
@@ -609,7 +609,7 @@ to { transform: rotate(360deg); }
             <!-- Basic Hammer NFT -->
             <div class="nft-card">
                 <video autoplay loop muted playsinline class="w-full h-64 object-contain mb-4 rounded-lg">
-                    <source src="b.mp4" type="video/mp4">
+                    <source src="https://github.com/Onixs50/Egi-Megi/raw/main/b.mp4" type="video/mp4">
                 </video>
                 <h3 class="text-2xl font-bold text-yellow-400 mb-2">Basic Hammer</h3>
                 <p class="text-gray-400 mb-4">Price: 0.00002 BERA</p>
@@ -624,7 +624,7 @@ to { transform: rotate(360deg); }
             <!-- Advanced Hammer NFT -->
             <div class="nft-card">
                 <video autoplay loop muted playsinline class="w-full h-64 object-contain mb-4 rounded-lg">
-                    <source src="a.mp4" type="video/mp4">
+                    <source src="https://github.com/Onixs50/Egi-Megi/raw/main/a.mp4" type="video/mp4">
                 </video>
                 <h3 class="text-2xl font-bold text-yellow-400 mb-2">Advanced Hammer</h3>
                 <p class="text-gray-400 mb-4">Price: 0.00005 BERA</p>
@@ -663,7 +663,7 @@ to { transform: rotate(360deg); }
 
             <!-- Dance Video Container -->
             <div id="danceVideoContainer" class="dance-video-container">
-                <video id="danceVideo" src="chikdanse.mp4" muted playsinline></video>
+                <video id="danceVideo" src="https://github.com/Onixs50/Egi-Megi/raw/main/chikdanse.mp4" muted playsinline></video>
             </div>
 
             <!-- Info Button -->
@@ -1360,7 +1360,7 @@ function startGamePhase() {
             const videoContainer = document.createElement('div');
             videoContainer.className = 'fixed inset-0 z-50 bg-black';
             const video = document.createElement('video');
-            video.src = 'welcome2.mp4';
+            video.src = 'https://github.com/Onixs50/Egi-Megi/raw/main/welcome2.mp4';
             video.className = 'w-full h-full object-cover';
             video.muted = true;
             video.autoplay = true;
@@ -1450,7 +1450,7 @@ function returnToNFTSection() {
             const columns = screenWidth < 768 ? 3 : 5;
             const eggs = Array(columns * 2).fill().map((_, i) => `
                 <div class="egg cursor-pointer transform transition-all duration-300" data-index="${i}">
-                    <img src="egg.png" alt="Egg" class="w-full h-auto object-contain">
+                    <img src="https://github.com/Onixs50/Egi-Megi/raw/main/egg.png" alt="Egg" class="w-full h-auto object-contain">
                 </div>
             `).join('');
 
